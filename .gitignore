@@ -1,0 +1,15 @@
+# Archivos de compilación y distribución de NetBeans
+build/
+nbproject/private/
+dist/
+nbdist/
+.mtj.tmp/
+
+# Archivos de registro y temporales
+*.log
+*.tmp
+*.bak
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db
