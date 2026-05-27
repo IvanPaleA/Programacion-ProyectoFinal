@@ -9,14 +9,12 @@ import java.sql.SQLException;
  */
 public class ConexionBD {
     private static Connection conexion = null;
-    // Si al ejecutar el script en la terminal mantuviste el nombre, usa 'ferreteria_uv'
     private static final String URL = "jdbc:mysql://localhost:3306/heladeria";
     private static final String USUARIO = "root";
-    private static final String PASSWORD = "1234"; // Coloca aquí la contraseña de tu MySQL root
+    private static final String PASSWORD = "1234";
 
     public static Connection getConexion() {
     try {
-        // Corrección: Si la conexión es nula O está cerrada, creamos una nueva
         if (conexion == null || conexion.isClosed()) {
             Class.forName("com.mysql.cj.jdbc.Driver");
             conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);

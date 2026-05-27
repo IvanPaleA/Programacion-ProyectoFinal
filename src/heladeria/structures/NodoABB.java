@@ -16,7 +16,6 @@ public class NodoABB {
         this.derecho = null;
     }
 
-    // Getters y Setters para controlar la estructura del árbol
 
     public Producto getProducto() {
         return producto;

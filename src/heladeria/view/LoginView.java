@@ -22,7 +22,7 @@ public class LoginView extends JFrame {
     private void inicializarComponentes() {
         setSize(420, 520);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Centra la ventana en la pantalla
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         getContentPane().setBackground(Color.WHITE);
 
@@ -125,11 +125,10 @@ public class LoginView extends JFrame {
         if (usuarioDAO.validarUsuario(usuario, password)) {
             JOptionPane.showMessageDialog(this, "¡Acceso concedido! Bienvenido al sistema.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             
-            // Instancia e inicia la interfaz del menú dinámico
             MainView sistemaPrincipal = new MainView();
             sistemaPrincipal.setVisible(true);
             
-            this.dispose(); // Cierra el formulario de login para liberar memoria
+            this.dispose(); 
         } else {
             JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos.", "Error de Autenticación", JOptionPane.ERROR_MESSAGE);
         }

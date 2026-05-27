@@ -17,7 +17,7 @@ public class ProductoForm extends JDialog {
     private JTextField txtClave, txtNombre, txtExistencia, txtUbicacion, txtPrecio;
     private JTextArea txtDescripcion;
     private JLabel lblFotoEstado;
-    private byte[] bytesFoto = null; // Almacenamiento binario de la imagen
+    private byte[] bytesFoto = null;
     private boolean guardadoExitoso = false;
 
     public ProductoForm(Frame padre, boolean modal) {
@@ -38,7 +38,7 @@ public class ProductoForm extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(6, 0, 6, 0);
 
-        // 1. Campo: Clave (9 dígitos)
+        //Clave (9 dígitos)
         gbc.gridx = 0; gbc.gridy = 0;
         panelCampos.add(new JLabel("Clave (9 dígitos):"), gbc);
         txtClave = new JTextField();
@@ -46,7 +46,7 @@ public class ProductoForm extends JDialog {
         gbc.gridx = 1;
         panelCampos.add(txtClave, gbc);
 
-        // 2. Campo: Nombre del producto
+        //Nombre del producto
         gbc.gridx = 0; gbc.gridy = 1;
         panelCampos.add(new JLabel("Nombre del producto:"), gbc);
         txtNombre = new JTextField();
@@ -54,7 +54,7 @@ public class ProductoForm extends JDialog {
         gbc.gridx = 1;
         panelCampos.add(txtNombre, gbc);
 
-        // 3. Campo: Existencia
+        //Existencia
         gbc.gridx = 0; gbc.gridy = 2;
         panelCampos.add(new JLabel("Existencia:"), gbc);
         txtExistencia = new JTextField();
@@ -62,7 +62,7 @@ public class ProductoForm extends JDialog {
         gbc.gridx = 1;
         panelCampos.add(txtExistencia, gbc);
 
-        // 4. Campo: Ubicación
+        //Ubicación
         gbc.gridx = 0; gbc.gridy = 3;
         panelCampos.add(new JLabel("Ubicación (estante/almacén):"), gbc);
         txtUbicacion = new JTextField();
@@ -70,7 +70,7 @@ public class ProductoForm extends JDialog {
         gbc.gridx = 1;
         panelCampos.add(txtUbicacion, gbc);
 
-        // 5. Campo: Precio de venta
+        //Precio de venta
         gbc.gridx = 0; gbc.gridy = 4;
         panelCampos.add(new JLabel("Precio de venta:"), gbc);
         txtPrecio = new JTextField();
@@ -78,7 +78,7 @@ public class ProductoForm extends JDialog {
         gbc.gridx = 1;
         panelCampos.add(txtPrecio, gbc);
 
-        // 6. Campo: Foto del producto
+        //Foto del producto
         gbc.gridx = 0; gbc.gridy = 5;
         panelCampos.add(new JLabel("Foto del producto:"), gbc);
         JButton btnCargarFoto = new JButton("Seleccionar Imagen");
@@ -91,7 +91,7 @@ public class ProductoForm extends JDialog {
         gbc.gridy = 6;
         panelCampos.add(lblFotoEstado, gbc);
 
-        // 7. Campo: Descripción
+        //Descripción
         gbc.gridx = 0; gbc.gridy = 7;
         panelCampos.add(new JLabel("Descripción (opcional):"), gbc);
         txtDescripcion = new JTextArea(3, 20);
@@ -100,7 +100,7 @@ public class ProductoForm extends JDialog {
         gbc.gridx = 1;
         panelCampos.add(scrollDesc, gbc);
 
-        // Barra inferior de acciones (Guardar / Cancelar)
+        //Guardar / Cancelar)
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         panelBotones.setBackground(new Color(245, 245, 245));
         JButton btnCancelar = new JButton("Cancelar");
@@ -114,7 +114,6 @@ public class ProductoForm extends JDialog {
         add(panelCampos, BorderLayout.CENTER);
         add(panelBotones, BorderLayout.SOUTH);
 
-        // Lógica para capturar y procesar los bytes de la foto
         btnCargarFoto.addActionListener(e -> {
             JFileChooser selector = new JFileChooser();
             int resultado = selector.showOpenDialog(this);
@@ -142,7 +141,6 @@ public class ProductoForm extends JDialog {
         String ubicacion = txtUbicacion.getText().trim();
         String precioStr = txtPrecio.getText().trim();
 
-        // Validación estricta de la estructura de la clave
         if (!clave.matches("\\d{9}")) {
             JOptionPane.showMessageDialog(this, "La clave debe contener exactamente 9 dígitos numéricos.", "Validación", JOptionPane.ERROR_MESSAGE);
             return;
@@ -157,7 +155,6 @@ public class ProductoForm extends JDialog {
             int existencia = Integer.parseInt(existenciaStr);
             double precio = Double.parseDouble(precioStr);
 
-            // Crear el objeto e invocar el DAO relacional
             Producto nuevoProducto = new Producto(clave, nombre, existencia, ubicacion, precio, bytesFoto);
             ProductoDAO dao = new ProductoDAO();
 

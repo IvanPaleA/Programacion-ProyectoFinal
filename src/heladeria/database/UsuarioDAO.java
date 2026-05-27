@@ -19,7 +19,7 @@ public class UsuarioDAO {
             ps.setString(2, password);
             
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next(); // Retorna true si encontró coincidencia
+                return rs.next(); 
             }
         } catch (SQLException e) {
             System.err.println("Error al validar usuario: " + e.getMessage());

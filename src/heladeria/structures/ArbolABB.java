@@ -14,7 +14,6 @@ public class ArbolABB {
         this.raiz = null;
     }
 
-    // Inserción de un nuevo producto en el árbol
     public void insertar(Producto producto) {
         raiz = insertarRec(raiz, producto);
     }
@@ -24,7 +23,6 @@ public class ArbolABB {
             return new NodoABB(producto);
         }
 
-        // Comparación de las claves de 9 dígitos de forma numérica o alfabética
         long claveActual = Long.parseLong(actual.getProducto().getClave());
         long claveNueva = Long.parseLong(producto.getClave());
 
@@ -36,7 +34,6 @@ public class ArbolABB {
         return actual;
     }
 
-    // Búsqueda por Clave (Eficiencia promedio de O(log n))
     public Producto buscarPorClave(String clave) {
         return buscarPorClaveRec(raiz, Long.parseLong(clave));
     }
@@ -53,7 +50,6 @@ public class ArbolABB {
             : buscarPorClaveRec(actual.getDerecho(), clave);
     }
 
-    // Búsqueda por Nombre dentro del ABB
     public List<Producto> buscarPorNombre(String nombre) {
         List<Producto> resultados = new ArrayList<>();
         buscarPorNombreRec(raiz, nombre.toLowerCase(), resultados);
@@ -63,7 +59,6 @@ public class ArbolABB {
     private void buscarPorNombreRec(NodoABB actual, String nombre, List<Producto> resultados) {
         if (actual == null) return;
 
-        // Recorremos todo el árbol buscando coincidencias en el nombre
         buscarPorNombreRec(actual.getIzquierdo(), nombre, resultados);
         if (actual.getProducto().getNombre().toLowerCase().contains(nombre)) {
             resultados.add(actual.getProducto());
@@ -71,7 +66,6 @@ public class ArbolABB {
         buscarPorNombreRec(actual.getDerecho(), nombre, resultados);
     }
 
-    // Generar Lista ordenada mediante recorrido INORDEN para la JTable
     public List<Producto> getListaInorden() {
         List<Producto> lista = new ArrayList<>();
         inordenRec(raiz, lista);
@@ -81,7 +75,7 @@ public class ArbolABB {
     private void inordenRec(NodoABB actual, List<Producto> lista) {
         if (actual != null) {
             inordenRec(actual.getIzquierdo(), lista);
-            lista.add(actual.getProducto()); // Izquierda - Raíz - Derecha
+            lista.add(actual.getProducto()); 
             inordenRec(actual.getDerecho(), lista);
         }
     }

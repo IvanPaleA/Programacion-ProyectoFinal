@@ -16,54 +16,46 @@ import heladeria.structures.AlgoritmosOrdenamiento;
  */
 public class MainView extends JFrame {
 
-    // Instancias de Backend y Controladores de Datos
     private final ProductoDAO productoDAO = new ProductoDAO();
     private final ArbolABB arbolABB = new ArbolABB();
-    private final String usuarioActivo = "Administrador"; // Usuario logueado
+    private final String usuarioActivo = "Administrador"; 
 
-    // Componentes estructurales de la GUI
     private CardLayout cardLayout;
     private JPanel panelContenido;
 
-    // Componentes del panel de Inventario
     private JTable tablaInventario;
     private DefaultTableModel modeloTablaInventario;
     private JTextField txtBuscarInventario;
     private JLabel lblDetalleClave, lblDetalleNombre, lblDetalleExistencia, lblDetalleUbicacion, lblDetallePrecio, lblDetalleFoto;
     private JTextArea txtDetalleDescripcion;
 
-    // Componentes del panel de Ventas
     private JTable tablaVentasCatalogo, tablaCarrito;
     private DefaultTableModel modeloTablaVentas, modeloTablaCarrito;
     private JTextField txtBuscarVentas;
     private JLabel lblSubtotalVal, lblTotalVal;
 
-    // Componentes del panel de Bitácora
     private JTable tablaBitacora;
     private DefaultTableModel modeloTablaBitacora;
 
     public MainView() {
         super("Sistema de Inventario y Ventas - Heladería Luxe Gelato");
         inicializarComponentes();
-        cargarDatosDesdeBD(); // Carga el ABB e inicializa la tabla en Inorden al arrancar
+        cargarDatosDesdeBD(); 
     }
 
     /**
-     * Paso Crítico: Lee los datos de MySQL, los indexa en la estructura del ABB 
+     *Lee los datos de MySQL, los indexa en la estructura del ABB 
      * y genera la visualización predeterminada mediante recorrido Inorden.
      */
     private void cargarDatosDesdeBD() {
-        arbolABB.limpiar(); // Limpia el árbol por seguridad
+        arbolABB.limpiar(); 
         
-        // 1. Recuperar la lista completa de productos desde la base de datos
         List<Producto> productosBD = productoDAO.listar();
         
-        // 2. Insertar cada producto dentro del Árbol Binario de Búsqueda
         for (Producto p : productosBD) {
             arbolABB.insertar(p);
         }
         
-        // 3. Poblar la tabla de la interfaz gráfica usando el recorrido INORDEN
         llenarTablaInventario(arbolABB.getListaInorden());
     }
 
@@ -71,7 +63,7 @@ public class MainView extends JFrame {
      * Encargado de limpiar y repintar la JTable de Inventario con la lista proporcionada.
      */
     private void llenarTablaInventario(List<Producto> lista) {
-        modeloTablaInventario.setRowCount(0); // Borra filas anteriores
+        modeloTablaInventario.setRowCount(0); 
         for (Producto p : lista) {
             modeloTablaInventario.addRow(new Object[]{
                 p.getClave(),
@@ -82,6 +74,15 @@ public class MainView extends JFrame {
                 p.getFoto() != null ? "[Con Imagen]" : "[Sin Imagen]"
             });
         }
+        // Sincronizamos también el catálogo de ventas
+        if (modeloTablaVentas != null) {
+            modeloTablaVentas.setRowCount(0);
+            for (Producto p : lista) {
+                modeloTablaVentas.addRow(new Object[]{
+                    p.getClave(), p.getNombre(), "$" + p.getPrecio(), p.getExistencia()
+                });
+            }
+        }
     }
 
     private void inicializarComponentes() {
@@ -90,9 +91,7 @@ public class MainView extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // =====================================================================
         // BARRA LATERAL (Sidebar)
-        // =====================================================================
         JPanel panelSidebar = new JPanel();
         panelSidebar.setBackground(new Color(245, 245, 245));
         panelSidebar.setPreferredSize(new Dimension(220, 750));
@@ -139,7 +138,7 @@ public class MainView extends JFrame {
         // Enlaces de navegación
         btnInicio.addActionListener(e -> cardLayout.show(panelContenido, "CardInicio"));
         btnInventario.addActionListener(e -> {
-            cargarDatosDesdeBD(); // Recarga sincronizada al abrir inventario
+            cargarDatosDesdeBD(); 
             cardLayout.show(panelContenido, "CardInventario");
         });
         btnVentas.addActionListener(e -> cardLayout.show(panelContenido, "CardVentas"));
@@ -149,7 +148,7 @@ public class MainView extends JFrame {
             if (op == JOptionPane.YES_OPTION) this.dispose();
         });
 
-        // BARRA DE ESTADO INFERIOR (Footer)
+        // BARRA  INFERIOR (Footer)
         JPanel panelFooter = new JPanel(new BorderLayout());
         panelFooter.setBackground(new Color(240, 240, 240));
         panelFooter.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
@@ -263,13 +262,13 @@ public class MainView extends JFrame {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 String criterio = txtBuscarInventario.getText().trim();
                 if (criterio.isEmpty()) {
-                    llenarTablaInventario(arbolABB.getListaInorden()); // Regresa al orden base
+                    llenarTablaInventario(arbolABB.getListaInorden()); 
                 } else {
                     List<Producto> resultados = new ArrayList<>();
-                    if (criterio.matches("\\d+")) { // Si son puros dígitos, busca por clave en el ABB
+                    if (criterio.matches("\\d+")) { 
                         Producto p = arbolABB.buscarPorClave(criterio);
                         if (p != null) resultados.add(p);
-                    } else { // Si es texto, busca por coincidencia de nombre usando el ABB
+                    } else { 
                         resultados = arbolABB.buscarPorNombre(criterio);
                     }
                     llenarTablaInventario(resultados);
@@ -288,11 +287,31 @@ public class MainView extends JFrame {
             ProductoForm formulario = new ProductoForm(this, true);
             formulario.setVisible(true);
             if (formulario.isGuardadoExitoso()) {
-                cargarDatosDesdeBD(); // Recarga y actualiza automáticamente el ABB y la JTable
+                cargarDatosDesdeBD(); 
             }
         });
         JButton btnEditar = new JButton("Editar");
         JButton btnEliminar = new JButton("Eliminar");
+        btnEliminar.addActionListener(e -> {
+            int filaSel = tablaInventario.getSelectedRow();
+            if (filaSel == -1) {
+                JOptionPane.showMessageDialog(this, "Seleccione un producto de la tabla primero.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            // Sacar la clave de la tabla y buscar el objeto completo en el Árbol
+            String clave = tablaInventario.getValueAt(filaSel, 0).toString();
+            Producto productoSeleccionado = arbolABB.buscarPorClave(clave);
+
+            if (productoSeleccionado != null) {
+                EliminarForm formEliminar = new EliminarForm(this, true, productoSeleccionado);
+                formEliminar.setVisible(true);
+                
+                // Si sí lo borró, recargamos la tabla desde la BD
+                if (formEliminar.isEliminadoExitoso()) {
+                    cargarDatosDesdeBD();
+                }
+            }
+        });
         JButton btnQuickSort = new JButton("Ordenar por nombre (QuickSort)");
         JButton btnMergeSort = new JButton("Ordenar por precio (MergeSort)");
 
@@ -301,13 +320,13 @@ public class MainView extends JFrame {
          */
         btnQuickSort.addActionListener(e -> {
             List<Producto> lista = arbolABB.getListaInorden();
-            AlgoritmosOrdenamiento.ordenarPorNombre(lista); // Llama al método QuickSort
+            AlgoritmosOrdenamiento.ordenarPorNombre(lista); 
             llenarTablaInventario(lista);
         });
 
         btnMergeSort.addActionListener(e -> {
             List<Producto> lista = arbolABB.getListaInorden();
-            AlgoritmosOrdenamiento.ordenarPorPrecio(lista); // Llama al método MergeSort
+            AlgoritmosOrdenamiento.ordenarPorPrecio(lista); 
             llenarTablaInventario(lista);
         });
 
@@ -318,11 +337,10 @@ public class MainView extends JFrame {
         panelAcciones.add(btnMergeSort);
 
         String[] columnas = {"Clave (9 dígitos)", "Producto", "Existencia", "Ubicación", "Precio", "Foto"};
-        // Modificamos el modelo para desactivar la edición directa en las celdas
         modeloTablaInventario = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Bloquea la edición en todas las celdas por igual
+                return false; 
             }
         };
         tablaInventario = new JTable(modeloTablaInventario);
@@ -337,7 +355,7 @@ public class MainView extends JFrame {
                 int fila = tablaInventario.getSelectedRow();
                 if (fila != -1) {
                     String clave = tablaInventario.getValueAt(fila, 0).toString();
-                    Producto p = arbolABB.buscarPorClave(clave); // Recupera los datos del ABB
+                    Producto p = arbolABB.buscarPorClave(clave); 
                     if (p != null) {
                         lblDetalleClave.setText("Clave: " + p.getClave());
                         lblDetalleNombre.setText("Producto: " + p.getNombre());
@@ -346,18 +364,14 @@ public class MainView extends JFrame {
                         lblDetallePrecio.setText("Precio: $" + p.getPrecio());
                         txtDetalleDescripcion.setText("Sabor artesanal premium elaborado con ingredientes 100% naturales.");
                         if (p.getFoto() != null && p.getFoto().length > 0) {
-                            // 1. Convertir el arreglo de bytes de la BD en una imagen de Java
                             ImageIcon iconoOriginal = new ImageIcon(p.getFoto());
                             Image imagenMatriz = iconoOriginal.getImage();
 
-                            // 2. Redimensionar la imagen para que se adapte al tamaño fijo del Label del Prototipo
                             Image imagenEscalada = imagenMatriz.getScaledInstance(200, 150, Image.SCALE_SMOOTH);
 
-                            // 3. Colocar el icono escalado y remover cualquier texto previo
                             lblDetalleFoto.setIcon(new ImageIcon(imagenEscalada));
                             lblDetalleFoto.setText(""); 
                         } else {
-                            // Si el helado no cuenta con foto, limpiamos el componente e indicamos el estado
                             lblDetalleFoto.setIcon(null);
                             lblDetalleFoto.setText("[Sin Imagen]");
                         }
@@ -423,43 +437,53 @@ public class MainView extends JFrame {
         header.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         JLabel title = new JLabel("Módulo de Ventas");
         title.setFont(new Font("SansSerif", Font.BOLD, 22));
-        JLabel sub = new JLabel("Busque productos, agréguelo al carrito y realice la venta.");
+        JLabel sub = new JLabel("Busque productos, agréguelos al carrito y realice la venta.");
         header.add(title);
         header.add(sub);
 
         JPanel panelGrid = new JPanel(new GridLayout(1, 2, 15, 0));
         panelGrid.setBackground(Color.WHITE);
 
+        // --- SECCIÓN 1: CATÁLOGO ---
         JPanel panelCatalogo = new JPanel(new BorderLayout());
-        panelCatalogo.setBorder(BorderFactory.createTitledBorder("1. Buscar productos"));
+        panelCatalogo.setBorder(BorderFactory.createTitledBorder("1. Buscar productos (Doble clic para agregar)"));
         txtBuscarVentas = new JTextField();
         txtBuscarVentas.setBorder(BorderFactory.createTitledBorder("Buscar por clave o nombre:"));
         
-        String[] colCat = {"Clave", "Producto", "Precio", "Stock", "Acción"};
-        modeloTablaVentas = new DefaultTableModel(colCat, 0);
+        String[] colCat = {"Clave", "Producto", "Precio", "Stock"}; 
+        // Hacemos que la tabla del catálogo no sea editable
+        modeloTablaVentas = new DefaultTableModel(colCat, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
         tablaVentasCatalogo = new JTable(modeloTablaVentas);
         panelCatalogo.add(txtBuscarVentas, BorderLayout.NORTH);
         panelCatalogo.add(new JScrollPane(tablaVentasCatalogo), BorderLayout.CENTER);
 
+        // --- SECCIÓN 2: CARRITO ---
         JPanel panelCarritoContenedor = new JPanel(new BorderLayout());
         panelCarritoContenedor.setBorder(BorderFactory.createTitledBorder("2. Carrito de compra"));
         panelCarritoContenedor.setBackground(Color.WHITE);
 
-        String[] colCart = {"Producto", "Precio", "Cantidad", "Importe", "Eliminar"};
-        modeloTablaCarrito = new DefaultTableModel(colCart, 0);
+        String[] colCart = {"Clave", "Producto", "Cantidad", "Importe"}; 
+        // Hacemos que la tabla del carrito tampoco sea editable
+        modeloTablaCarrito = new DefaultTableModel(colCart, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
         tablaCarrito = new JTable(modeloTablaCarrito);
 
         JPanel panelTotales = new JPanel(new GridBagLayout());
         panelTotales.setBackground(Color.WHITE);
         GridBagConstraints c = new GridBagConstraints();
-        lblSubtotalVal = new JLabel("Subtotal: $0.00");
-        lblTotalVal = new JLabel("Total a pagar: $0.00");
+        lblSubtotalVal = new JLabel("Subtotal: $0.00"); 
+        lblTotalVal = new JLabel("Total a pagar: $0.00"); 
         lblTotalVal.setFont(new Font("SansSerif", Font.BOLD, 14));
         
-        JButton btnCobrar = new JButton("Realizar venta");
+        JButton btnCobrar = new JButton("Realizar venta"); 
         btnCobrar.setBackground(new Color(40, 167, 69));
         btnCobrar.setForeground(Color.WHITE);
-        JButton btnCancelar = new JButton("Cancelar venta");
+        JButton btnCancelar = new JButton("Vaciar carrito"); 
 
         c.gridx = 0; c.gridy = 0; c.insets = new Insets(5, 5, 5, 5); c.anchor = GridBagConstraints.WEST;
         panelTotales.add(lblSubtotalVal, c);
@@ -475,9 +499,80 @@ public class MainView extends JFrame {
 
         panelGrid.add(panelCatalogo);
         panelGrid.add(panelCarritoContenedor);
-
         panel.add(header, BorderLayout.NORTH);
         panel.add(panelGrid, BorderLayout.CENTER);
+
+        // --- EVENTOS DE INTERACTIVIDAD ---
+
+        // 1. Doble clic en el catálogo para pedir cantidad y pasar al carrito
+        tablaVentasCatalogo.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (evt.getClickCount() == 2) { // Si hace doble clic
+                    int fila = tablaVentasCatalogo.getSelectedRow();
+                    if (fila != -1) {
+                        String clave = modeloTablaVentas.getValueAt(fila, 0).toString();
+                        String nombre = modeloTablaVentas.getValueAt(fila, 1).toString();
+                        double precio = Double.parseDouble(modeloTablaVentas.getValueAt(fila, 2).toString().replace("$", ""));
+                        int stockDisp = Integer.parseInt(modeloTablaVentas.getValueAt(fila, 3).toString());
+
+                        if (stockDisp <= 0) {
+                            JOptionPane.showMessageDialog(panel, "Producto agotado.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+
+                        String cantStr = JOptionPane.showInputDialog(panel, "¿Cuántos helados de '" + nombre + "' desea agregar?", "Cantidad", JOptionPane.QUESTION_MESSAGE);
+                        if (cantStr != null && !cantStr.trim().isEmpty()) {
+                            try {
+                                int cantidad = Integer.parseInt(cantStr);
+                                if (cantidad > 0 && cantidad <= stockDisp) {
+                                    double importe = precio * cantidad;
+                                    modeloTablaCarrito.addRow(new Object[]{clave, nombre, cantidad, "$" + importe});
+                                    actualizarTotalesCarrito();
+                                } else {
+                                    JOptionPane.showMessageDialog(panel, "Cantidad no válida o supera la existencia.", "Error", JOptionPane.ERROR_MESSAGE);
+                                }
+                            } catch (NumberFormatException ex) {
+                                JOptionPane.showMessageDialog(panel, "Ingrese un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 2. Botón para vaciar el carrito
+        btnCancelar.addActionListener(e -> {
+            modeloTablaCarrito.setRowCount(0);
+            actualizarTotalesCarrito();
+        });
+        
+        // 3. Botón para procesar la venta
+        btnCobrar.addActionListener(e -> {
+            if (modeloTablaCarrito.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(panel, "El carrito está vacío. Agregue productos primero.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Extraemos el total a cobrar limpiando el texto del label
+            double totalCobro = Double.parseDouble(lblTotalVal.getText().replace("Total a pagar: $", ""));
+            
+            // Instanciamos nuestro nuevo DAO
+            heladeria.database.VentaDAO ventaDAO = new heladeria.database.VentaDAO();
+            
+            // Mandamos a guardar la venta con el usuario logueado
+            if (ventaDAO.registrarVentaCompleta(totalCobro, usuarioActivo, modeloTablaCarrito)) {
+                JOptionPane.showMessageDialog(panel, "¡Venta realizada con éxito!\nTotal cobrado: $" + String.format("%.2f", totalCobro), "Operación Exitosa", JOptionPane.INFORMATION_MESSAGE);
+                
+                // Vaciamos el carrito
+                modeloTablaCarrito.setRowCount(0);
+                actualizarTotalesCarrito();
+                
+                // Recargamos los datos desde la BD para que el catálogo de ventas y el inventario reflejen el nuevo stock
+                cargarDatosDesdeBD();
+            } else {
+                JOptionPane.showMessageDialog(panel, "Ocurrió un error al procesar la venta.", "Error Crítico", JOptionPane.ERROR_MESSAGE);
+            }
+        });
 
         return panel;
     }
@@ -506,5 +601,17 @@ public class MainView extends JFrame {
         panel.add(scroll, BorderLayout.CENTER);
 
         return panel;
+    }
+    
+    // Método para calcular el subtotal y total del carrito automáticamente
+    private void actualizarTotalesCarrito() {
+        double total = 0.0;
+        for (int i = 0; i < modeloTablaCarrito.getRowCount(); i++) {
+            // Obtenemos el importe de la columna 3 (que tiene el símbolo $) y lo limpiamos
+            String importeStr = modeloTablaCarrito.getValueAt(i, 3).toString().replace("$", "");
+            total += Double.parseDouble(importeStr);
+        }
+        lblSubtotalVal.setText("Subtotal: $" + String.format("%.2f", total));
+        lblTotalVal.setText("Total a pagar: $" + String.format("%.2f", total));
     }
 }

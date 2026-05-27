@@ -4,13 +4,12 @@ package heladeria.model;
  * Representa un producto (helado, insumo, etc.) en el inventario.
  */
 public class Producto {
-    // Atributo 'final' para garantizar que la clave sea inmutable tras el registro
     private final String clave; 
     private String nombre;
     private int existencia;
-    private String ubicacion; // Estante o refrigerador
+    private String ubicacion; 
     private double precio;
-    private byte[] foto; // La foto se guarda en bytes para la base de datos
+    private byte[] foto; 
 
     public Producto(String clave, String nombre, int existencia, String ubicacion, double precio, byte[] foto) {
         this.clave = clave;
@@ -21,7 +20,6 @@ public class Producto {
         this.foto = foto;
     }
 
-    // Getters para todos los atributos
 
     public String getNombre() {
         return nombre;

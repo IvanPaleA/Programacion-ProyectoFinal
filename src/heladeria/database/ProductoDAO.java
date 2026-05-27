@@ -10,11 +10,9 @@ import java.util.List;
  */
 public class ProductoDAO {
 
-    // Registrar un producto en la BD
-    // Registrar un producto en la BD
+    // registrar un producto en la BD
     public boolean insertar(Producto p) {
         String sql = "INSERT INTO productos (clave, nombre, existencia, ubicacion, precio, foto) VALUES (?, ?, ?, ?, ?, ?)";
-        // Sacamos la conexion del try() para que no se cierre de forma automatica
         Connection con = ConexionBD.getConexion(); 
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -41,7 +39,7 @@ public class ProductoDAO {
     public List<Producto> listar() {
         List<Producto> lista = new ArrayList<>();
         String sql = "SELECT * FROM productos";
-        Connection con = ConexionBD.getConexion(); // Sacada del try()
+        Connection con = ConexionBD.getConexion(); 
 
         try (Statement st = con.createStatement(); 
              ResultSet rs = st.executeQuery(sql)) {
@@ -61,7 +59,7 @@ public class ProductoDAO {
         return lista;
     }
 
-    // Modificar un producto (Sin incluir la clave, que es inmutable)
+    // Modificar un producto )
     public boolean editar(Producto p) {
         String sql = "UPDATE productos SET nombre = ?, existencia = ?, ubicacion = ?, precio = ?, foto = ? WHERE clave = ?";
         try (Connection con = ConexionBD.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -78,7 +76,6 @@ public class ProductoDAO {
         }
     }
 
-    // Eliminar producto por clave guardando registro previo en Bitácora
     public boolean eliminar(String clave, String razon, String usuarioActivo) {
         String buscarSql = "SELECT * FROM productos WHERE clave = ?";
         String bitacoraSql = "INSERT INTO bitacora_eliminacion (clave_producto, nombre_producto, razon_eliminacion, fecha_eliminacion, usuario_sistema) VALUES (?, ?, ?, NOW(), ?)";
@@ -87,9 +84,8 @@ public class ProductoDAO {
         Connection con = null;
         try {
             con = ConexionBD.getConexion();
-            con.setAutoCommit(false); // Iniciamos una transacción para asegurar consistencia
+            con.setAutoCommit(false); 
 
-            // 1. Conseguir datos del producto antes de borrarlo
             String nombreProducto = "";
             try (PreparedStatement psBuscar = con.prepareStatement(buscarSql)) {
                 psBuscar.setString(1, clave);
@@ -97,12 +93,11 @@ public class ProductoDAO {
                     if (rs.next()) {
                         nombreProducto = rs.getString("nombre");
                     } else {
-                        return false; // El producto no existe
+                        return false; 
                     }
                 }
             }
 
-            // 2. Insertar los datos en la tabla de bitácora
             try (PreparedStatement psBitacora = con.prepareStatement(bitacoraSql)) {
                 psBitacora.setString(1, clave);
                 psBitacora.setString(2, nombreProducto);
@@ -111,14 +106,13 @@ public class ProductoDAO {
                 psBitacora.executeUpdate();
             }
 
-            // 3. Eliminar el producto del inventario
             int filasAfectadas;
             try (PreparedStatement psEliminar = con.prepareStatement(eliminarSql)) {
                 psEliminar.setString(1, clave);
                 filasAfectadas = psEliminar.executeUpdate();
             }
 
-            con.commit(); // Confirmamos la transacción completa
+            con.commit(); 
             return filasAfectadas > 0;
 
         } catch (SQLException e) {
@@ -129,4 +123,41 @@ public class ProductoDAO {
             return false;
         }
     }
+    
+    // Método que elimina un producto y guarda el registro en la bitácora de forma segura
+    public boolean eliminarConBitacora(Producto p, String razon, String usuario) {
+        String sqlBitacora = "INSERT INTO bitacora_eliminacion (clave_producto, nombre_producto, razon_eliminacion, fecha_eliminacion, usuario_sistema) VALUES (?, ?, ?, NOW(), ?)";
+        String sqlEliminar = "DELETE FROM productos WHERE clave = ?";
+
+        java.sql.Connection con = ConexionBD.getConexion();
+        try {
+            // Pausamos el autoguardado para asegurar que ambas cosas pasen juntas (Transacción)
+            con.setAutoCommit(false); 
+            
+            // 1. Guardar la razón en la bitácora
+            try (java.sql.PreparedStatement psBit = con.prepareStatement(sqlBitacora)) {
+                psBit.setString(1, p.getClave());
+                psBit.setString(2, p.getNombre());
+                psBit.setString(3, razon);
+                psBit.setString(4, usuario);
+                psBit.executeUpdate();
+            }
+            
+            // 2. Eliminar el helado del inventario
+            try (java.sql.PreparedStatement psEli = con.prepareStatement(sqlEliminar)) {
+                psEli.setString(1, p.getClave());
+                psEli.executeUpdate();
+            }
+            
+            con.commit(); // Confirmamos los cambios
+            return true;
+        } catch (java.sql.SQLException e) {
+            try { con.rollback(); } catch (java.sql.SQLException ex) {} // Si algo falla, cancelamos todo para no dañar la BD
+            System.err.println("Error al eliminar: " + e.getMessage());
+            return false;
+        } finally {
+            try { con.setAutoCommit(true); } catch (java.sql.SQLException ex) {}
+        }
+    }
+    
 }
