@@ -34,7 +34,7 @@ public class LoginView extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(8, 0, 8, 0);
 
-        // Logo Principal del Prototipo
+        // Logo Principal
         JLabel lblLogo = new JLabel("LUXE GELATO", JLabel.CENTER);
         lblLogo.setFont(new Font("Serif", Font.BOLD, 28));
         gbc.gridx = 0; gbc.gridy = 0;
@@ -85,11 +85,19 @@ public class LoginView extends JFrame {
         panelCard.add(txtPassword, gbc);
 
         // Botón de Iniciar Sesión
+        // Botón de Iniciar Sesión (Ajuste de contraste en el texto)
         btnIniciarSesion = new JButton("Iniciar Sesión");
         btnIniciarSesion.setFont(new Font("SansSerif", Font.BOLD, 14));
-        btnIniciarSesion.setBackground(new Color(33, 33, 33)); // Tono oscuro industrial
-        btnIniciarSesion.setForeground(Color.WHITE);
+        
+        // Aplicamos tu idea: Cambiamos el color del texto a un gris casi negro
+        btnIniciarSesion.setForeground(new Color(33, 33, 33)); 
+        
+        // Dejamos que Java maneje el fondo (o forzamos el azul clarito si lo prefieres)
+        btnIniciarSesion.setBackground(new Color(225, 238, 248)); 
+        
         btnIniciarSesion.setFocusPainted(false);
+        btnIniciarSesion.setCursor(new Cursor(Cursor.HAND_CURSOR)); 
+        
         btnIniciarSesion.setPreferredSize(new Dimension(200, 40));
         gbc.gridy = 8; gbc.insets = new Insets(5, 0, 10, 0);
         panelCard.add(btnIniciarSesion, gbc);

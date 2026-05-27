@@ -142,29 +142,51 @@ public class MainView extends JFrame {
             cardLayout.show(panelContenido, "CardInventario");
         });
         btnVentas.addActionListener(e -> cardLayout.show(panelContenido, "CardVentas"));
-        btnBitacora.addActionListener(e -> cardLayout.show(panelContenido, "CardBitacora"));
+        btnBitacora.addActionListener(e -> {
+            cargarDatosBitacora();
+            cardLayout.show(panelContenido, "CardBitacora");
+        });
         btnCerrarSesion.addActionListener(e -> {
             int op = JOptionPane.showConfirmDialog(this, "¿Desea cerrar la sesión?", "Salir", JOptionPane.YES_NO_OPTION);
             if (op == JOptionPane.YES_OPTION) this.dispose();
         });
 
         // BARRA  INFERIOR (Footer)
-        JPanel panelFooter = new JPanel(new BorderLayout());
-        panelFooter.setBackground(new Color(240, 240, 240));
-        panelFooter.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
-        panelFooter.setPreferredSize(new Dimension(1200, 30));
-
-        JLabel lblUsuario = new JLabel("  Usuario: " + usuarioActivo);
-        lblUsuario.setFont(new Font("SansSerif", Font.PLAIN, 11));
-        JLabel lblFechaHora = new JLabel("Fecha: 12/05/2026  |  Hora: 11:30 AM  ");
-        lblFechaHora.setFont(new Font("SansSerif", Font.PLAIN, 11));
-
-        panelFooter.add(lblUsuario, BorderLayout.WEST);
-        panelFooter.add(lblFechaHora, BorderLayout.EAST);
-
         add(panelSidebar, BorderLayout.WEST);
         add(panelContenido, BorderLayout.CENTER);
-        add(panelFooter, BorderLayout.SOUTH);
+        
+        // Agregamos la nueva barra de estado dinámica a la parte inferior
+        add(crearBarraEstado(), BorderLayout.SOUTH);
+    }
+    
+    // Método para construir una barra de estado moderna y en tiempo real
+    private JPanel crearBarraEstado() {
+        JPanel panelEstado = new JPanel(new BorderLayout());
+        panelEstado.setBackground(new Color(245, 245, 245));
+        
+        panelEstado.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(220, 220, 220)), 
+            BorderFactory.createEmptyBorder(6, 15, 6, 15) 
+        ));
+
+        JLabel lblUsuario = new JLabel("👤 Usuario: " + usuarioActivo); 
+        lblUsuario.setFont(new Font("SansSerif", Font.BOLD, 12));
+        lblUsuario.setForeground(new Color(70, 70, 70));
+
+        JLabel lblReloj = new JLabel();
+        lblReloj.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        lblReloj.setForeground(new Color(70, 70, 70));
+
+        javax.swing.Timer relojTimer = new javax.swing.Timer(1000, e -> {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy   |   hh:mm:ss a");
+            lblReloj.setText("🕒 " + sdf.format(new java.util.Date()));
+        });
+        relojTimer.start(); 
+
+        panelEstado.add(lblUsuario, BorderLayout.WEST);
+        panelEstado.add(lblReloj, BorderLayout.EAST);
+
+        return panelEstado;
     }
 
     private JButton crearBotonSidebar(String texto) {
@@ -180,56 +202,99 @@ public class MainView extends JFrame {
     }
 
     private JPanel crearPanelInicio() {
-        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.WHITE);
+
+        // 1. Título y Subtítulo centrados
+        JPanel panelHeader = new JPanel();
+        panelHeader.setLayout(new BoxLayout(panelHeader, BoxLayout.Y_AXIS));
+        panelHeader.setBackground(Color.WHITE);
+        panelHeader.setBorder(BorderFactory.createEmptyBorder(60, 0, 40, 0)); // Más espacio para respirar
+
+        JLabel lblBienvenida = new JLabel("Bienvenido a Luxe Gelato");
+        lblBienvenida.setFont(new Font("Serif", Font.BOLD, 36)); // Fuente elegante
+        lblBienvenida.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel lblSub = new JLabel("Sistema Integral de Inventario y Punto de Venta");
+        lblSub.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        lblSub.setForeground(Color.GRAY);
+        lblSub.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        panelHeader.add(lblBienvenida);
+        panelHeader.add(Box.createVerticalStrut(10));
+        panelHeader.add(lblSub);
+
+        // 2. Tarjetas interactivas de Acceso Rápido
+        JPanel panelTarjetas = new JPanel(new GridBagLayout());
+        panelTarjetas.setBackground(Color.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 25, 10, 25); // Separación horizontal entre tarjetas
 
-        JLabel lblBienvenido = new JLabel("Bienvenido al sistema", JLabel.CENTER);
-        lblBienvenido.setFont(new Font("Serif", Font.BOLD, 26));
-        JLabel lblSeleccione = new JLabel("Seleccione el módulo que desea utilizar", JLabel.CENTER);
-        lblSeleccione.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        lblSeleccione.setForeground(Color.GRAY);
+        // Creamos las tarjetas usando un método auxiliar (Paso 2)
+        // Usamos colores pastel muy suaves acordes a una heladería
+        JPanel cardInventario = crearTarjetaInteractiva("Inventario", 
+                "Administre sus helados, existencias<br>y visualice el catálogo en tiempo real.", 
+                new Color(240, 248, 255)); // Azul hielo muy tenue
 
-        JPanel cardInv = new JPanel(new BorderLayout());
-        cardInv.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true));
-        cardInv.setPreferredSize(new Dimension(250, 200));
-        cardInv.setBackground(new Color(252, 252, 252));
-        JButton btnGoInv = new JButton("INVENTARIO");
-        btnGoInv.setFont(new Font("SansSerif", Font.BOLD, 16));
-        btnGoInv.setFocusPainted(false);
-        btnGoInv.addActionListener(e -> cardLayout.show(panelContenido, "CardInventario"));
-        JTextArea txtDescInv = new JTextArea("Administra los productos,\nexistencias y el inventario\nde la heladería.");
-        txtDescInv.setEditable(false);
-        txtDescInv.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        txtDescInv.setBackground(new Color(252, 252, 252));
-        cardInv.add(btnGoInv, BorderLayout.NORTH);
-        cardInv.add(txtDescInv, BorderLayout.CENTER);
+        JPanel cardVentas = crearTarjetaInteractiva("Punto de Venta", 
+                "Realice ventas rápidas, gestione<br>el carrito y emita tickets de compra.", 
+                new Color(245, 255, 250)); // Verde menta muy tenue
 
-        JPanel cardVen = new JPanel(new BorderLayout());
-        cardVen.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true));
-        cardVen.setPreferredSize(new Dimension(250, 200));
-        cardVen.setBackground(new Color(252, 252, 252));
-        JButton btnGoVen = new JButton("VENTAS");
-        btnGoVen.setFont(new Font("SansSerif", Font.BOLD, 16));
-        btnGoVen.setFocusPainted(false);
-        btnGoVen.addActionListener(e -> cardLayout.show(panelContenido, "CardVentas"));
-        JTextArea txtDescVen = new JTextArea("Realiza ventas de productos\ny genera comprobantes\nde compra.");
-        txtDescVen.setEditable(false);
-        txtDescVen.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        txtDescVen.setBackground(new Color(252, 252, 252));
-        cardVen.add(btnGoVen, BorderLayout.NORTH);
-        cardVen.add(txtDescVen, BorderLayout.CENTER);
+        // Les damos interactividad: Al hacer clic, te llevan a la pestaña correspondiente
+        cardInventario.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                // Asegúrate de que "CardInventario" sea el nombre exacto que usaste en tu CardLayout
+                cardLayout.show(panelContenido, "CardInventario"); 
+            }
+        });
+        
+        cardVentas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                // Asegúrate de que "CardVentas" sea el nombre exacto que usaste en tu CardLayout
+                cardLayout.show(panelContenido, "CardVentas");
+            }
+        });
 
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2; gbc.insets = new Insets(0, 0, 10, 0);
-        panel.add(lblBienvenido, gbc);
-        gbc.gridy = 1; gbc.insets = new Insets(0, 0, 40, 0);
-        panel.add(lblSeleccione, gbc);
-        gbc.gridwidth = 1; gbc.gridy = 2; gbc.insets = new Insets(0, 20, 0, 20);
-        panel.add(cardInv, gbc);
-        gbc.gridx = 1;
-        panel.add(cardVen, gbc);
+        gbc.gridx = 0; panelTarjetas.add(cardInventario, gbc);
+        gbc.gridx = 1; panelTarjetas.add(cardVentas, gbc);
+
+        panel.add(panelHeader, BorderLayout.NORTH);
+        panel.add(panelTarjetas, BorderLayout.CENTER);
 
         return panel;
+    }
+    
+    // Método auxiliar para diseñar tarjetas de menú bonitas y uniformes
+    private JPanel crearTarjetaInteractiva(String titulo, String descripcion, Color colorFondo) {
+        JPanel tarjeta = new JPanel();
+        tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
+        tarjeta.setBackground(colorFondo);
+        
+        // Creamos un borde sutil y un buen relleno (padding) interior
+        tarjeta.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+            BorderFactory.createEmptyBorder(40, 30, 40, 30)
+        ));
+        tarjeta.setPreferredSize(new Dimension(320, 220));
+        tarjeta.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Cambia el puntero a manita
+
+        JLabel lblTitulo = new JLabel(titulo);
+        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 20));
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Usamos HTML para permitir saltos de línea automáticos y centrado de texto perfecto
+        JLabel lblDesc = new JLabel("<html><div style='text-align: center; color: #555555;'>" + descripcion + "</div></html>");
+        lblDesc.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        lblDesc.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Box.createVerticalGlue() empuja el contenido hacia el centro verticalmente
+        tarjeta.add(Box.createVerticalGlue());
+        tarjeta.add(lblTitulo);
+        tarjeta.add(Box.createVerticalStrut(20)); // Espacio entre título y descripción
+        tarjeta.add(lblDesc);
+        tarjeta.add(Box.createVerticalGlue());
+
+        return tarjeta;
     }
 
     private JPanel crearPanelInventario() {
@@ -290,7 +355,29 @@ public class MainView extends JFrame {
                 cargarDatosDesdeBD(); 
             }
         });
+        
         JButton btnEditar = new JButton("Editar");
+        btnEditar.addActionListener(e -> {
+            int filaSel = tablaInventario.getSelectedRow();
+            if (filaSel == -1) {
+                JOptionPane.showMessageDialog(this, "Seleccione un producto de la tabla para editar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            String clave = tablaInventario.getValueAt(filaSel, 0).toString();
+            Producto productoAEditar = arbolABB.buscarPorClave(clave);
+            
+            if (productoAEditar != null) {
+                // Llamamos al nuevo constructor que diseñamos para edición
+                ProductoForm formEdicion = new ProductoForm(this, true, productoAEditar);
+                formEdicion.setVisible(true);
+                
+                if (formEdicion.isGuardadoExitoso()) {
+                    cargarDatosDesdeBD(); // Recarga la tabla si se modificó algo
+                }
+            }
+        });
+        
         JButton btnEliminar = new JButton("Eliminar");
         btnEliminar.addActionListener(e -> {
             int filaSel = tablaInventario.getSelectedRow();
@@ -312,8 +399,33 @@ public class MainView extends JFrame {
                 }
             }
         });
+        
         JButton btnQuickSort = new JButton("Ordenar por nombre (QuickSort)");
         JButton btnMergeSort = new JButton("Ordenar por precio (MergeSort)");
+        // Evento para Ordenar por Nombre usando tu QuickSort
+        btnQuickSort.addActionListener(e -> {
+            heladeria.database.ProductoDAO dao = new heladeria.database.ProductoDAO();
+            List<Producto> lista = dao.listar(); // Obtenemos los datos frescos de MySQL
+            
+            if (lista != null && !lista.isEmpty()) {
+                // Llamamos a tu método limpio
+                heladeria.structures.AlgoritmosOrdenamiento.ordenarPorNombre(lista);
+                llenarTablaInventario(lista); // Pintamos la tabla ya ordenada
+            }
+        });
+
+        // Evento para Ordenar por Precio usando tu MergeSort
+        btnMergeSort.addActionListener(e -> {
+            heladeria.database.ProductoDAO dao = new heladeria.database.ProductoDAO();
+            List<Producto> lista = dao.listar(); 
+            
+            if (lista != null && !lista.isEmpty()) {
+                // Llamamos a tu método limpio
+                heladeria.structures.AlgoritmosOrdenamiento.ordenarPorPrecio(lista);
+                llenarTablaInventario(lista);
+            }
+        });
+        
 
         /**
          * ENLACE DE ALGORITMOS DE ORDENAMIENTO USANDO LISTAS
@@ -561,14 +673,18 @@ public class MainView extends JFrame {
             
             // Mandamos a guardar la venta con el usuario logueado
             if (ventaDAO.registrarVentaCompleta(totalCobro, usuarioActivo, modeloTablaCarrito)) {
-                JOptionPane.showMessageDialog(panel, "¡Venta realizada con éxito!\nTotal cobrado: $" + String.format("%.2f", totalCobro), "Operación Exitosa", JOptionPane.INFORMATION_MESSAGE);
                 
-                // Vaciamos el carrito
+                // 1. Mostrar el ticket en pantalla
+                TicketView ticket = new TicketView(this, true, modeloTablaCarrito, totalCobro, usuarioActivo);
+                ticket.setVisible(true);
+                
+                // 2. Limpiar la mesa de trabajo (carrito vacío y total en cero)
                 modeloTablaCarrito.setRowCount(0);
                 actualizarTotalesCarrito();
                 
-                // Recargamos los datos desde la BD para que el catálogo de ventas y el inventario reflejen el nuevo stock
+                // 3. Sincronizar el inventario recargando los datos desde MySQL
                 cargarDatosDesdeBD();
+                
             } else {
                 JOptionPane.showMessageDialog(panel, "Ocurrió un error al procesar la venta.", "Error Crítico", JOptionPane.ERROR_MESSAGE);
             }
@@ -592,7 +708,10 @@ public class MainView extends JFrame {
         panelHeader.add(subtitle);
 
         String[] colBitacora = {"Clave (9 dígitos)", "Producto", "Razón de eliminación", "Fecha de eliminación", "Usuario que eliminó"};
-        modeloTablaBitacora = new DefaultTableModel(colBitacora, 0);
+        modeloTablaBitacora = new DefaultTableModel(colBitacora, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
         tablaBitacora = new JTable(modeloTablaBitacora);
         JScrollPane scroll = new JScrollPane(tablaBitacora);
         scroll.setBorder(BorderFactory.createTitledBorder("Productos eliminados"));
@@ -613,5 +732,16 @@ public class MainView extends JFrame {
         }
         lblSubtotalVal.setText("Subtotal: $" + String.format("%.2f", total));
         lblTotalVal.setText("Total a pagar: $" + String.format("%.2f", total));
+    }
+    
+    // Método para consultar la BD y llenar la tabla de la bitácora
+    private void cargarDatosBitacora() {
+        modeloTablaBitacora.setRowCount(0); // Limpia la tabla
+        heladeria.database.BitacoraDAO bitacoraDAO = new heladeria.database.BitacoraDAO();
+        
+        // Recorre la lista real y la dibuja fila por fila
+        for (String[] fila : bitacoraDAO.listarBitacora()) {
+            modeloTablaBitacora.addRow(fila);
+        }
     }
 }

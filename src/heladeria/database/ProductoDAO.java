@@ -160,4 +160,31 @@ public class ProductoDAO {
         }
     }
     
+    // Actualizar un producto existente en la BD
+    public boolean actualizar(Producto p) {
+        String sql = "UPDATE productos SET nombre = ?, existencia = ?, ubicacion = ?, precio = ?, foto = ? WHERE clave = ?";
+        java.sql.Connection con = ConexionBD.getConexion();
+        
+        try (java.sql.PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, p.getNombre());
+            ps.setInt(2, p.getExistencia());
+            ps.setString(3, p.getUbicacion());
+            ps.setDouble(4, p.getPrecio());
+            
+            // Si la foto no es nula, la actualizamos.
+            if (p.getFoto() != null) {
+                ps.setBytes(5, p.getFoto());
+            } else {
+                ps.setNull(5, java.sql.Types.BLOB);
+            }
+            
+            ps.setString(6, p.getClave()); // La clave va al final para el WHERE
+            
+            return ps.executeUpdate() > 0;
+        } catch (java.sql.SQLException e) {
+            System.err.println("Error al actualizar producto: " + e.getMessage());
+            return false;
+        }
+    }
+    
 }

@@ -14,15 +14,39 @@ import heladeria.database.ProductoDAO;
  */
 public class ProductoForm extends JDialog {
 
-    private JTextField txtClave, txtNombre, txtExistencia, txtUbicacion, txtPrecio;
+    private JTextField txtClave, txtNombre, txtExistencia, txtPrecio;
+    private JComboBox<String> cmbUbicacion;
     private JTextArea txtDescripcion;
     private JLabel lblFotoEstado;
     private byte[] bytesFoto = null;
     private boolean guardadoExitoso = false;
+    private boolean modoEdicion = false;
 
     public ProductoForm(Frame padre, boolean modal) {
         super(padre, "Agregar / Editar Producto", modal);
         inicializarComponentes();
+    }
+    
+    // Constructor secundario para MODO EDICIÓN
+    public ProductoForm(Frame padre, boolean modal, Producto p) {
+        super(padre, "Editar Producto", modal);
+        this.modoEdicion = true;
+        inicializarComponentes();
+        
+        // Llenar los campos con los datos del producto seleccionado
+        txtClave.setText(p.getClave());
+        txtClave.setEditable(false); // Bloqueamos la clave para que no la rompan
+        txtClave.setBackground(new Color(230, 230, 230));
+        
+        txtNombre.setText(p.getNombre());
+        txtExistencia.setText(String.valueOf(p.getExistencia()));
+        cmbUbicacion.setSelectedItem(p.getUbicacion());
+        txtPrecio.setText(String.valueOf(p.getPrecio()));
+        
+        // Conservar la foto original si existe
+        if (p.getFoto() != null) {
+            this.bytesFoto = p.getFoto();
+        }
     }
 
     private void inicializarComponentes() {
@@ -63,12 +87,15 @@ public class ProductoForm extends JDialog {
         panelCampos.add(txtExistencia, gbc);
 
         //Ubicación
+        // 4. Campo: Ubicación con menú desplegable
         gbc.gridx = 0; gbc.gridy = 3;
-        panelCampos.add(new JLabel("Ubicación (estante/almacén):"), gbc);
-        txtUbicacion = new JTextField();
-        txtUbicacion.setPreferredSize(new Dimension(200, 30));
+        panelCampos.add(new JLabel("Ubicación exacta:"), gbc);
+        String[] opcionesUbicacion = {"Estante", "Almacén",};
+        cmbUbicacion = new JComboBox<>(opcionesUbicacion);
+        cmbUbicacion.setPreferredSize(new Dimension(200, 30));
+        cmbUbicacion.setBackground(Color.WHITE);
         gbc.gridx = 1;
-        panelCampos.add(txtUbicacion, gbc);
+        panelCampos.add(cmbUbicacion, gbc);
 
         //Precio de venta
         gbc.gridx = 0; gbc.gridy = 4;
@@ -138,7 +165,7 @@ public class ProductoForm extends JDialog {
         String clave = txtClave.getText().trim();
         String nombre = txtNombre.getText().trim();
         String existenciaStr = txtExistencia.getText().trim();
-        String ubicacion = txtUbicacion.getText().trim();
+        String ubicacion = cmbUbicacion.getSelectedItem().toString();
         String precioStr = txtPrecio.getText().trim();
 
         if (!clave.matches("\\d{9}")) {
@@ -155,15 +182,23 @@ public class ProductoForm extends JDialog {
             int existencia = Integer.parseInt(existenciaStr);
             double precio = Double.parseDouble(precioStr);
 
+            // Crear el objeto e invocar el DAO
             Producto nuevoProducto = new Producto(clave, nombre, existencia, ubicacion, precio, bytesFoto);
             ProductoDAO dao = new ProductoDAO();
+            
+            boolean operacionExitosa;
+            if (modoEdicion) {
+                operacionExitosa = dao.actualizar(nuevoProducto);
+            } else {
+                operacionExitosa = dao.insertar(nuevoProducto);
+            }
 
-            if (dao.insertar(nuevoProducto)) {
-                JOptionPane.showMessageDialog(this, "¡Producto registrado con éxito!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            if (operacionExitosa) {
+                JOptionPane.showMessageDialog(this, "¡Operación realizada con éxito!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                 guardadoExitoso = true;
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "Error de persistencia. La clave podría estar duplicada.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error de persistencia en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (NumberFormatException e) {
