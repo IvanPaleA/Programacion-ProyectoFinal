@@ -13,3 +13,6 @@ nbdist/
 # Archivos de sistema operativo
 .DS_Store
 Thumbs.db
+
+# Ignorar comprobantes de venta generados localmente
+Ticket_*.txt
