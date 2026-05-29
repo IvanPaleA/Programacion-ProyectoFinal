@@ -15,7 +15,9 @@ public class BitacoraDAO {
     public List<String[]> listarBitacora() {
         List<String[]> lista = new ArrayList<>();
         // Consulta SQL para traer las columnas exactas que pide el prototipo
-        String sql = "SELECT clave_producto, nombre_producto, razon_eliminacion, fecha_eliminacion, usuario_sistema FROM bitacora_eliminacion ORDER BY fecha_eliminacion DESC";
+        String sql = "SELECT clave_producto, nombre_producto, razon_eliminacion, "
+                + "fecha_eliminacion, usuario_sistema FROM bitacora_eliminacion "
+                + "ORDER BY fecha_eliminacion DESC";
         
         Connection con = ConexionBD.getConexion();
         
@@ -23,7 +25,7 @@ public class BitacoraDAO {
              ResultSet rs = st.executeQuery(sql)) {
              
             while (rs.next()) {
-                // Empaquetamos cada fila como un arreglo de textos
+                //Se empaquita cada fila como un arreglo de textos
                 lista.add(new String[]{
                     rs.getString("clave_producto"),
                     rs.getString("nombre_producto"),

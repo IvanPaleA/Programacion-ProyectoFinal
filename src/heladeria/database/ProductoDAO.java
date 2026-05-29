@@ -12,7 +12,8 @@ public class ProductoDAO {
 
     // registrar un producto en la BD
     public boolean insertar(Producto p) {
-        String sql = "INSERT INTO productos (clave, nombre, existencia, ubicacion, precio, foto) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO productos (clave, nombre, existencia, "
+                + "ubicacion, precio, foto) VALUES (?, ?, ?, ?, ?, ?)";
         Connection con = ConexionBD.getConexion(); 
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -35,7 +36,7 @@ public class ProductoDAO {
         }
     }
 
-    // Listar todos los productos (se usa para poblar el ABB al iniciar)
+    // Listar todos los productos asi se puebla el abb
     public List<Producto> listar() {
         List<Producto> lista = new ArrayList<>();
         String sql = "SELECT * FROM productos";
@@ -59,10 +60,12 @@ public class ProductoDAO {
         return lista;
     }
 
-    // Modificar un producto )
+    //Modificar un producto )
     public boolean editar(Producto p) {
-        String sql = "UPDATE productos SET nombre = ?, existencia = ?, ubicacion = ?, precio = ?, foto = ? WHERE clave = ?";
-        try (Connection con = ConexionBD.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
+        String sql = "UPDATE productos SET nombre = ?, existencia = ?, ubicacion "
+                + "= ?, precio = ?, foto = ? WHERE clave = ?";
+        try (Connection con = ConexionBD.getConexion(); PreparedStatement ps = 
+                con.prepareStatement(sql)) {
             ps.setString(1, p.getNombre());
             ps.setInt(2, p.getExistencia());
             ps.setString(3, p.getUbicacion());
@@ -78,7 +81,9 @@ public class ProductoDAO {
 
     public boolean eliminar(String clave, String razon, String usuarioActivo) {
         String buscarSql = "SELECT * FROM productos WHERE clave = ?";
-        String bitacoraSql = "INSERT INTO bitacora_eliminacion (clave_producto, nombre_producto, razon_eliminacion, fecha_eliminacion, usuario_sistema) VALUES (?, ?, ?, NOW(), ?)";
+        String bitacoraSql = "INSERT INTO bitacora_eliminacion (clave_producto, "
+                + "nombre_producto, razon_eliminacion, fecha_eliminacion, "
+                + "usuario_sistema) VALUES (?, ?, ?, NOW(), ?)";
         String eliminarSql = "DELETE FROM productos WHERE clave = ?";
         
         Connection con = null;
@@ -124,17 +129,16 @@ public class ProductoDAO {
         }
     }
     
-    // Método que elimina un producto y guarda el registro en la bitácora de forma segura
+    //elimina un producto y guarda el registro en la bitácora
     public boolean eliminarConBitacora(Producto p, String razon, String usuario) {
         String sqlBitacora = "INSERT INTO bitacora_eliminacion (clave_producto, nombre_producto, razon_eliminacion, fecha_eliminacion, usuario_sistema) VALUES (?, ?, ?, NOW(), ?)";
         String sqlEliminar = "DELETE FROM productos WHERE clave = ?";
 
         java.sql.Connection con = ConexionBD.getConexion();
         try {
-            // Pausamos el autoguardado para asegurar que ambas cosas pasen juntas (Transacción)
             con.setAutoCommit(false); 
             
-            // 1. Guardar la razón en la bitácora
+            
             try (java.sql.PreparedStatement psBit = con.prepareStatement(sqlBitacora)) {
                 psBit.setString(1, p.getClave());
                 psBit.setString(2, p.getNombre());
@@ -143,16 +147,16 @@ public class ProductoDAO {
                 psBit.executeUpdate();
             }
             
-            // 2. Eliminar el helado del inventario
+            //Eliminar el helado del inventario
             try (java.sql.PreparedStatement psEli = con.prepareStatement(sqlEliminar)) {
                 psEli.setString(1, p.getClave());
                 psEli.executeUpdate();
             }
             
-            con.commit(); // Confirmamos los cambios
+            con.commit(); // confirmar
             return true;
         } catch (java.sql.SQLException e) {
-            try { con.rollback(); } catch (java.sql.SQLException ex) {} // Si algo falla, cancelamos todo para no dañar la BD
+            try { con.rollback(); } catch (java.sql.SQLException ex) {} 
             System.err.println("Error al eliminar: " + e.getMessage());
             return false;
         } finally {
@@ -160,9 +164,10 @@ public class ProductoDAO {
         }
     }
     
-    // Actualizar un producto existente en la BD
+    //Actualizar un producto existente en la BD
     public boolean actualizar(Producto p) {
-        String sql = "UPDATE productos SET nombre = ?, existencia = ?, ubicacion = ?, precio = ?, foto = ? WHERE clave = ?";
+        String sql = "UPDATE productos SET nombre = ?, existencia = ?, ubicacion = ?, "
+                + "precio = ?, foto = ? WHERE clave = ?";
         java.sql.Connection con = ConexionBD.getConexion();
         
         try (java.sql.PreparedStatement ps = con.prepareStatement(sql)) {
@@ -171,14 +176,14 @@ public class ProductoDAO {
             ps.setString(3, p.getUbicacion());
             ps.setDouble(4, p.getPrecio());
             
-            // Si la foto no es nula, la actualizamos.
+            // si la foto no es nula
             if (p.getFoto() != null) {
                 ps.setBytes(5, p.getFoto());
             } else {
                 ps.setNull(5, java.sql.Types.BLOB);
             }
             
-            ps.setString(6, p.getClave()); // La clave va al final para el WHERE
+            ps.setString(6, p.getClave());
             
             return ps.executeUpdate() > 0;
         } catch (java.sql.SQLException e) {

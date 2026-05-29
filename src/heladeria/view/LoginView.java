@@ -85,14 +85,9 @@ public class LoginView extends JFrame {
         panelCard.add(txtPassword, gbc);
 
         // Botón de Iniciar Sesión
-        // Botón de Iniciar Sesión (Ajuste de contraste en el texto)
         btnIniciarSesion = new JButton("Iniciar Sesión");
         btnIniciarSesion.setFont(new Font("SansSerif", Font.BOLD, 14));
-        
-        // Aplicamos tu idea: Cambiamos el color del texto a un gris casi negro
         btnIniciarSesion.setForeground(new Color(33, 33, 33)); 
-        
-        // Dejamos que Java maneje el fondo (o forzamos el azul clarito si lo prefieres)
         btnIniciarSesion.setBackground(new Color(225, 238, 248)); 
         
         btnIniciarSesion.setFocusPainted(false);
