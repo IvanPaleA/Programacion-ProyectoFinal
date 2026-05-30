@@ -7,9 +7,20 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.table.DefaultTableModel;
 
+/**
+ * Clase que maneja las operaciones de base de datos para las ventas.
+ */
 public class VentaDAO {
 
     // Registra la venta completa: ticket, detalles y actualización de inventario
+    /**
+     * Registra una venta completa en la base de datos, incluyendo el ticket, los detalles y actualizando el inventario.
+     * 
+     * @param total El total a pagar de la venta
+     * @param usuario El nombre del usuario que realiza la venta
+     * @param carrito El modelo de la tabla que contiene los productos de la venta
+     * @return true si la venta se registró correctamente, false si hubo un error
+     */
     public boolean registrarVentaCompleta(double total, String usuario, DefaultTableModel carrito) {
         String sqlVenta = "INSERT INTO ventas (fecha_venta, total, usuario_vendedor) VALUES (NOW(), ?, ?)";
         String sqlDetalle = "INSERT INTO detalle_ventas (id_venta, clave_producto, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)";

@@ -8,10 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Clase encargada de extraer el historial de eliminaciones para auditoría.
+ * Clase encargada de consultar el historial de eliminaciones para auditoría.
  */
 public class BitacoraDAO {
 
+    /**
+     * Obtiene una lista con todos los registros de la bitácora de eliminación de la base de datos.
+     * 
+     * @return Una lista de arreglos de texto con los datos de la bitácora
+     */
     public List<String[]> listarBitacora() {
         List<String[]> lista = new ArrayList<>();
         // Consulta SQL para traer las columnas exactas que pide el prototipo

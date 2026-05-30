@@ -6,11 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Administra las transacciones SQL de los productos y la bitácora.
+ * Administra las operaciones SQL de los productos y la bitácora.
  */
 public class ProductoDAO {
 
     // registrar un producto en la BD
+    /**
+     * Inserta un nuevo producto en la base de datos.
+     * 
+     * @param p El objeto Producto que se va a guardar
+     * @return true si el producto se insertó correctamente, false en caso contrario
+     */
     public boolean insertar(Producto p) {
         String sql = "INSERT INTO productos (clave, nombre, existencia, "
                 + "ubicacion, precio, foto) VALUES (?, ?, ?, ?, ?, ?)";
@@ -37,6 +43,11 @@ public class ProductoDAO {
     }
 
     // Listar todos los productos asi se puebla el abb
+    /**
+     * Obtiene una lista con todos los productos registrados en la base de datos.
+     * 
+     * @return Una lista con los objetos Producto
+     */
     public List<Producto> listar() {
         List<Producto> lista = new ArrayList<>();
         String sql = "SELECT * FROM productos";
@@ -61,6 +72,12 @@ public class ProductoDAO {
     }
 
     //Modificar un producto )
+    /**
+     * Modifica los datos de un producto existente en la base de datos.
+     * 
+     * @param p El objeto Producto con los datos actualizados
+     * @return true si se editó correctamente, false si falló
+     */
     public boolean editar(Producto p) {
         String sql = "UPDATE productos SET nombre = ?, existencia = ?, ubicacion "
                 + "= ?, precio = ?, foto = ? WHERE clave = ?";
@@ -79,6 +96,14 @@ public class ProductoDAO {
         }
     }
 
+    /**
+     * Elimina un producto por su clave y guarda el registro de quién lo borró y por qué.
+     * 
+     * @param clave La clave del producto a eliminar
+     * @param razon El motivo por el que se elimina el producto
+     * @param usuarioActivo El usuario que realiza la eliminación
+     * @return true si se eliminó y registró correctamente, false si hubo un error
+     */
     public boolean eliminar(String clave, String razon, String usuarioActivo) {
         String buscarSql = "SELECT * FROM productos WHERE clave = ?";
         String bitacoraSql = "INSERT INTO bitacora_eliminacion (clave_producto, "
@@ -130,6 +155,14 @@ public class ProductoDAO {
     }
     
     //elimina un producto y guarda el registro en la bitácora
+    /**
+     * Elimina un producto pasándole el objeto completo y guarda el motivo en la bitácora.
+     * 
+     * @param p El objeto Producto a eliminar
+     * @param razon El motivo de la eliminación
+     * @param usuario El usuario que elimina el producto
+     * @return true si la eliminación fue exitosa, false en caso de error
+     */
     public boolean eliminarConBitacora(Producto p, String razon, String usuario) {
         String sqlBitacora = "INSERT INTO bitacora_eliminacion (clave_producto, nombre_producto, razon_eliminacion, fecha_eliminacion, usuario_sistema) VALUES (?, ?, ?, NOW(), ?)";
         String sqlEliminar = "DELETE FROM productos WHERE clave = ?";
@@ -165,6 +198,12 @@ public class ProductoDAO {
     }
     
     //Actualizar un producto existente en la BD
+    /**
+     * Actualiza la información de un producto en la base de datos.
+     * 
+     * @param p El producto con la información nueva
+     * @return true si se actualizó con éxito, false si ocurrió un problema
+     */
     public boolean actualizar(Producto p) {
         String sql = "UPDATE productos SET nombre = ?, existencia = ?, ubicacion = ?, "
                 + "precio = ?, foto = ? WHERE clave = ?";

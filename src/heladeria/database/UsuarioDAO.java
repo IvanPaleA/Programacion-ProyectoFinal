@@ -10,6 +10,13 @@ import java.sql.SQLException;
  */
 public class UsuarioDAO {
     
+    /**
+     * Verifica si el usuario y la contraseña coinciden en la base de datos.
+     * 
+     * @param username El nombre de usuario a validar
+     * @param password La contraseña del usuario
+     * @return true si las credenciales son correctas, false si no lo son
+     */
     public boolean validarUsuario(String username, String password) {
         String sql = "SELECT * FROM usuarios WHERE username = ? AND password = ?";
         try (Connection con = ConexionBD.getConexion();
