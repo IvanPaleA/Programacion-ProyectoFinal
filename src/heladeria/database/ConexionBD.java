@@ -11,7 +11,7 @@ public class ConexionBD {
     private static Connection conexion = null;
     private static final String URL = "jdbc:mysql://localhost:3306/heladeria";
     private static final String USUARIO = "root";
-    private static final String PASSWORD = "1234";
+    private static final String PASSWORD = "Goku2004";
 
     public static Connection getConexion() {
     try {

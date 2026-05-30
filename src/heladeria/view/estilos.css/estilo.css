@@ -1,0 +1,60 @@
+.panel-fondo {
+    -fx-background-color: #fdf5e6;
+    -fx-border-color: #e5d3b3;
+    -fx-border-width: 4px;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+}
+
+.barra-cuadros {
+    -fx-background-color: #dc2626; /* Un rojo sólido para simular el mantel del encabezado */
+    -fx-background-radius: 5px;
+}
+
+.titulo-azul {
+    -fx-text-fill: #1e3a8a;
+}
+
+.etiqueta-negra {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: #111827;
+}
+
+.input-pizzatron {
+    -fx-background-color: white;
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2px;
+    -fx-border-radius: 25px;
+    -fx-background-radius: 25px;
+    -fx-padding: 8px 15px;
+    -fx-font-size: 14px;
+}
+
+.radio-pizzatron {
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e3a8a;
+    -fx-border-color: #3b82f6;
+    -fx-border-radius: 15px;
+    -fx-padding: 10px 20px;
+}
+
+.btn-verde-pizzatron {
+    -fx-background-color: #65a30d;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-background-radius: 25px;
+    -fx-padding: 15px;
+    -fx-cursor: hand;
+    -fx-pref-width: 300px;
+    
+    -fx-border-color: #4d7c0f;
+    -fx-border-width: 0 0 4px 0; 
+    -fx-border-radius: 25px;
+}
+
+.btn-verde-pizzatron:pressed {
+    -fx-border-width: 0;
+    -fx-translate-y: 4px;
+}

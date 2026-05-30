@@ -21,6 +21,7 @@ public class ProductoForm extends JDialog {
     private byte[] bytesFoto = null;
     private boolean guardadoExitoso = false;
     private boolean modoEdicion = false;
+    
 
     public ProductoForm(Frame padre, boolean modal) {
         super(padre, "Agregar / Editar Producto", modal);
@@ -62,7 +63,7 @@ public class ProductoForm extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(6, 0, 6, 0);
 
-        //Clave (9 dígitos)
+        // Clave (9 dígitos)
         gbc.gridx = 0; gbc.gridy = 0;
         panelCampos.add(new JLabel("Clave (9 dígitos):"), gbc);
         txtClave = new JTextField();
@@ -70,7 +71,7 @@ public class ProductoForm extends JDialog {
         gbc.gridx = 1;
         panelCampos.add(txtClave, gbc);
 
-        //Nombre del producto
+        // Nombre del producto
         gbc.gridx = 0; gbc.gridy = 1;
         panelCampos.add(new JLabel("Nombre del producto:"), gbc);
         txtNombre = new JTextField();
@@ -78,16 +79,28 @@ public class ProductoForm extends JDialog {
         gbc.gridx = 1;
         panelCampos.add(txtNombre, gbc);
 
-        //Existencia
+        // Existencia
         gbc.gridx = 0; gbc.gridy = 2;
         panelCampos.add(new JLabel("Existencia:"), gbc);
         txtExistencia = new JTextField();
         txtExistencia.setPreferredSize(new Dimension(200, 30));
+        
+        // --- VALIDACIÓN DE EXISTENCIA AÑADIDA AQUÍ ---
+        txtExistencia.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                char c = evt.getKeyChar();
+                if (!Character.isDigit(c)) {
+                    evt.consume(); 
+                    java.awt.Toolkit.getDefaultToolkit().beep();
+                }
+            }
+        });
+        
         gbc.gridx = 1;
         panelCampos.add(txtExistencia, gbc);
 
-        //Ubicación
-        // 4. Campo: Ubicación con menú desplegable
+        // Ubicación
         gbc.gridx = 0; gbc.gridy = 3;
         panelCampos.add(new JLabel("Ubicación exacta:"), gbc);
         String[] opcionesUbicacion = {"Estante", "Almacén",};
@@ -97,15 +110,28 @@ public class ProductoForm extends JDialog {
         gbc.gridx = 1;
         panelCampos.add(cmbUbicacion, gbc);
 
-        //Precio de venta
+        // Precio de venta
         gbc.gridx = 0; gbc.gridy = 4;
         panelCampos.add(new JLabel("Precio de venta:"), gbc);
         txtPrecio = new JTextField();
         txtPrecio.setPreferredSize(new Dimension(200, 30));
+        
+        // --- VALIDACIÓN DE PRECIO AÑADIDA AQUÍ ---
+        txtPrecio.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                char c = evt.getKeyChar();
+                if (!Character.isDigit(c) && c != '.') {
+                    evt.consume();
+                    java.awt.Toolkit.getDefaultToolkit().beep();
+                }
+            }
+        });
+        
         gbc.gridx = 1;
         panelCampos.add(txtPrecio, gbc);
 
-        //Foto del producto
+        // Foto del producto
         gbc.gridx = 0; gbc.gridy = 5;
         panelCampos.add(new JLabel("Foto del producto:"), gbc);
         JButton btnCargarFoto = new JButton("Seleccionar Imagen");
@@ -118,7 +144,7 @@ public class ProductoForm extends JDialog {
         gbc.gridy = 6;
         panelCampos.add(lblFotoEstado, gbc);
 
-        //Descripción
+        // Descripción
         gbc.gridx = 0; gbc.gridy = 7;
         panelCampos.add(new JLabel("Descripción (opcional):"), gbc);
         txtDescripcion = new JTextArea(3, 20);
@@ -127,7 +153,7 @@ public class ProductoForm extends JDialog {
         gbc.gridx = 1;
         panelCampos.add(scrollDesc, gbc);
 
-        //Guardar / Cancelar)
+        // Guardar / Cancelar
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         panelBotones.setBackground(new Color(245, 245, 245));
         JButton btnCancelar = new JButton("Cancelar");
